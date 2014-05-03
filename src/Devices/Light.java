@@ -1,5 +1,10 @@
 package Devices;
 
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+
+import Services.DeviceService;
+
 /*
  * Dispositivo: Bombilla
  * 
@@ -7,24 +12,45 @@ package Devices;
  * intermedios para controlar la intensidad de la iluminación.
  */
 
-public class Light {
+public class Light implements Device {
 
-	private int intensity;
+	private static DeviceService srv;
 
-	// Constructor. La bombilla está apagada cuando se instancia.
-	public Light() {
-		intensity = 0;
+	public static void main(String[] args) {
+		if (args.length != 1) {
+			System.out.println("Uso: Light <host>");
+		} else {
+			@SuppressWarnings("unused")
+			Light light = new Light(args[0]);
+		}
+
 	}
 
-	// Consulta la intensidad de la bombilla.
-	public int getIntensity() {
-		return intensity;
+	Light(String ip) {
+		try {
+			connect(ip);
+			srv.addDevice(this);
+			srv.test();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
-	// Ajusta la intensidad de la bombilla. Sólo acepta valores entre 0 y 255.
-	public void setIntensity(int intensity) {
-		if (intensity > 0 && intensity < 255) {
-			this.intensity = intensity;
+	private void connect(String ip) {
+		System.setProperty("java.security.policy", "file:policies.policy");
+
+		if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}
+
+		try {
+			srv = (DeviceService) Naming.lookup("//" + ip + ":" + "54321"
+					+ "/Device");
+		} catch (RemoteException e) {
+			System.err.println("Error de comunicacion: " + e.toString());
+		} catch (Exception e) {
+			System.err.println("Excepcion en Device:");
+			e.printStackTrace();
 		}
 	}
 }
