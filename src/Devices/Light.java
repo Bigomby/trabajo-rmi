@@ -1,5 +1,6 @@
 package Devices;
 
+import java.io.Serializable;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 
@@ -12,14 +13,16 @@ import Services.DeviceService;
  * intermedios para controlar la intensidad de la iluminación.
  */
 
-public class Light implements Device {
+public class Light implements Device, Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private static DeviceService srv;
 
 	public static void main(String[] args) {
 		if (args.length != 1) {
 			System.out.println("Uso: Light <host>");
 		} else {
+			System.setProperty("java.security.policy", "file:policies.policy");
 			@SuppressWarnings("unused")
 			Light light = new Light(args[0]);
 		}

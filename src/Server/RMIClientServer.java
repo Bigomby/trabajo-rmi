@@ -19,7 +19,6 @@ public class RMIClientServer implements Runnable {
 	
 	public void run() {
 		String ip = getIP();
-		System.setProperty("java.security.policy", "file:policies.policy");
 		System.setProperty("java.rmi.server.hostname", ip);
 
 		if (System.getSecurityManager() == null) {

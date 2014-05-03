@@ -23,7 +23,7 @@ class Client {
 
 		try {
 			ClientService srv = (ClientService) Naming.lookup("//"
-					+ args[0] + ":" + "54321" + "/Domotic");
+					+ args[0] + ":" + "54321" + "/Client");
 
 			srv.test();
 		} catch (RemoteException e) {

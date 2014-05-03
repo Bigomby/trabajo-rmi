@@ -18,14 +18,14 @@ import Devices.Device;
 public class Server {
 
 	static List<Device> devices;
-	static List<Room> rooms;
 	static ClientServiceImpl clientService;
 	static DeviceServiceImpl deviceService;
 
 	public static void main(String[] args) {
 		try {
+			System.setProperty("java.security.policy", "file:policies.policy");
+			
 			devices = Collections.synchronizedList(new ArrayList<Device>());
-			rooms = Collections.synchronizedList(new ArrayList<Room>());
 
 			clientService = new ClientServiceImpl();
 			deviceService = new DeviceServiceImpl();
@@ -41,8 +41,4 @@ public class Server {
 		}
 
 	}
-}
-
-class Room {
-
 }
