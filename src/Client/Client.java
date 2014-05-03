@@ -17,18 +17,13 @@ class Client {
 	static public void main(String args[]) {
 		System.setProperty("java.security.policy","file:policies.policy");
 		
-		if (args.length != 1) {
-			System.err.println("Uso: Client <Server>");
-			return;
-		}
-
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
 
 		try {
 			ServiceDomotic srv = (ServiceDomotic) Naming.lookup("//"
-					+ args[0] + ":" + 54321 + "/Domotic");
+					+ args[0] + ":" + "54321" + "/Domotic");
 
 			srv.test();
 		} catch (RemoteException e) {
