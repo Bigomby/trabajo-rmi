@@ -1,15 +1,11 @@
 package Server;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import Services.ServiceDomoticImpl;
+import Devices.Device;
 
 /*
  * Servidor
@@ -21,52 +17,32 @@ import Services.ServiceDomoticImpl;
 
 public class Server {
 
-	public static void main(String[] args) throws UnknownHostException,
-			SocketException {
-		String ip = getIP();
-		System.setProperty("java.security.policy", "file:policies.policy");
-		System.setProperty("java.rmi.server.hostname", ip);
+	static List<Device> devices;
+	static List<Room> rooms;
+	static ClientServiceImpl clientService;
+	static DeviceServiceImpl deviceService;
 
-		if (System.getSecurityManager() == null) {
-			System.setSecurityManager(new RMISecurityManager());
-		}
+	public static void main(String[] args) {
 		try {
-			ServiceDomoticImpl srv = new ServiceDomoticImpl();
-			Naming.rebind("//" + ip + ":" + "54321" + "/Domotic", srv);
-			System.out.println("Servidor Iniciado en " + ip);
+			devices = Collections.synchronizedList(new ArrayList<Device>());
+			rooms = Collections.synchronizedList(new ArrayList<Room>());
+
+			clientService = new ClientServiceImpl();
+			deviceService = new DeviceServiceImpl();
+
+			Runnable clientServer = new RMIClientServer(clientService);
+			Runnable deviceServer = new RMIDeviceServer(deviceService);
+
+			new Thread(clientServer).start();
+			new Thread(deviceServer).start();
+
 		} catch (RemoteException e) {
-			System.out.println("Error de comunicacion: " + e.toString());
-			System.exit(1);
-		} catch (Exception e) {
-			System.out.println("Excepcion en Domotic:");
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-
-	private static String getIP() {
-
-		String ip = null;
-
-		@SuppressWarnings("rawtypes")
-		Enumeration d;
-		try {
-			d = NetworkInterface.getNetworkInterfaces();
-
-			while (d.hasMoreElements()) {
-				NetworkInterface n = (NetworkInterface) d.nextElement();
-				Enumeration<InetAddress> ee = n.getInetAddresses();
-				while (ee.hasMoreElements()) {
-					InetAddress i = (InetAddress) ee.nextElement();
-					if (i.getHostAddress().toString().startsWith("192.168.1.")) {
-						ip = i.getHostAddress();
-					}
-				}
-			}
-		} catch (SocketException e) {
 			e.printStackTrace();
 		}
 
-		return ip;
 	}
+}
+
+class Room {
+
 }

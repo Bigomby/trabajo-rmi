@@ -3,7 +3,7 @@ package Client;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 
-import Services.ServiceDomotic;
+import Services.ClientService;
 
 /*
  * Cliente
@@ -22,7 +22,7 @@ class Client {
 		}
 
 		try {
-			ServiceDomotic srv = (ServiceDomotic) Naming.lookup("//"
+			ClientService srv = (ClientService) Naming.lookup("//"
 					+ args[0] + ":" + "54321" + "/Domotic");
 
 			srv.test();
