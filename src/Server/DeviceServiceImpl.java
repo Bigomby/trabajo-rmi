@@ -24,5 +24,11 @@ public class DeviceServiceImpl extends UnicastRemoteObject implements
 	 */
 	public void addDevice(Device device) throws RemoteException {
 		connectedDevices.add(device);
+		System.out.println("Nuevo dispositivo conectado");
+	}
+	
+	public void removeDevice(Device device) throws RemoteException {
+		connectedDevices.remove(device);
+		System.out.println("Dispositivo desconectado");
 	}
 }

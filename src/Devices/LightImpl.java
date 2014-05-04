@@ -4,6 +4,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import Services.Device;
 import Services.DeviceService;
 import Services.Light;
 
@@ -33,7 +34,7 @@ public class LightImpl extends UnicastRemoteObject implements Light {
 	LightImpl(String ip) throws RemoteException {
 		intensity = 0;
 		srv.addDevice(this);
-
+		Runtime.getRuntime().addShutdownHook(new ShutdownHookLight(srv, this));
 	}
 
 	public void setIntensity(int intensity) throws RemoteException {
@@ -62,4 +63,25 @@ public class LightImpl extends UnicastRemoteObject implements Light {
 			e.printStackTrace();
 		}
 	}
+}
+
+class ShutdownHookLight extends Thread{
+	
+	private DeviceService srv;
+	private Device device;
+	
+    public ShutdownHookLight (DeviceService srv, Device device){
+    	this.srv = srv;
+    	this.device = device;
+    }
+
+    public void run() {
+        try{
+            srv.removeDevice(device);
+            System.out.println("Dispositivo desconectado.");
+        }
+        catch(RemoteException e){
+            System.err.println("Error de comunicacion: " + e.toString());
+        }
+    }
 }
