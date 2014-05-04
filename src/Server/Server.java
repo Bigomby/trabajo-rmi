@@ -1,11 +1,11 @@
 package Server;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
-import Devices.Device;
+import Services.Device;
 
 /*
  * Servidor
@@ -17,18 +17,17 @@ import Devices.Device;
 
 public class Server {
 
-	static List<Device> devices;
-	static ClientServiceImpl clientService;
-	static DeviceServiceImpl deviceService;
-
 	public static void main(String[] args) {
 		try {
 			System.setProperty("java.security.policy", "file:policies.policy");
-			
-			devices = Collections.synchronizedList(new ArrayList<Device>());
 
-			clientService = new ClientServiceImpl();
-			deviceService = new DeviceServiceImpl();
+			List<Device> connectedDevices = (List<Device>) Collections
+					.synchronizedList(new LinkedList<Device>());
+
+			ClientServiceImpl clientService = new ClientServiceImpl(
+					connectedDevices);
+			DeviceServiceImpl deviceService = new DeviceServiceImpl(
+					connectedDevices);
 
 			Runnable clientServer = new RMIClientServer(clientService);
 			Runnable deviceServer = new RMIDeviceServer(deviceService);

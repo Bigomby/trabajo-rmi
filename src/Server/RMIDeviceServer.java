@@ -8,15 +8,14 @@ import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.util.Enumeration;
 
-
 public class RMIDeviceServer implements Runnable {
-	
+
 	DeviceServiceImpl deviceService;
-	
-	RMIDeviceServer(DeviceServiceImpl deviceService){
+
+	RMIDeviceServer(DeviceServiceImpl deviceService) {
 		this.deviceService = deviceService;
 	}
-	
+
 	public void run() {
 		String ip = getIP();
 		System.setProperty("java.rmi.server.hostname", ip);
@@ -25,16 +24,15 @@ public class RMIDeviceServer implements Runnable {
 			System.setSecurityManager(new RMISecurityManager());
 		}
 		try {
-			DeviceServiceImpl devices = new DeviceServiceImpl();
-			Naming.rebind("//" + ip + ":" + "54321" + "/Device", devices);
-			
+			Naming.rebind("//" + ip + ":" + "54321" + "/Device", deviceService);
+
 			System.out.println("Servidor de dispositivos iniciado en " + ip);
-			
+
 		} catch (RemoteException e) {
 			System.out.println("Error de comunicacion: " + e.toString());
 			System.exit(1);
 		} catch (Exception e) {
-			System.out.println("Excepcion en Domotic:");
+			System.out.println("Excepcion en dispositivo:");
 			e.printStackTrace();
 			System.exit(1);
 		}
