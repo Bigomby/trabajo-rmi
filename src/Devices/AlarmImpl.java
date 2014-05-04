@@ -4,47 +4,51 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import Services.Alarm;
 import Services.DeviceService;
-import Services.Light;
 
 /*
- * Dispositivo: Bombilla
- * 
- * Representa una bombilla, puede estar encendida o apagada. También puede tomar valores
- * intermedios para controlar la intensidad de la iluminación.
+ * Dispositivo: Alarma
+ * Controla el estado de la alarma
+ * El valor puede ser 0 (apagada) o 1 (encendida)
  */
 
-public class LightImpl extends UnicastRemoteObject implements Light {
+public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 
 	private static final long serialVersionUID = 1L;
-	private int intensity;
+	private int status;
 	private static DeviceService srv;
-
-	public static void main(String[] args) throws RemoteException {
+	
+	public static void main(String[] args) throws RemoteException, InterruptedException {
 		if (args.length != 1) {
-			System.out.println("Uso: Light <host>");
+			System.out.println("Uso: AlarmImpl <host>");
 		} else {
 			System.setProperty("java.security.policy", "file:policies.policy");
 			connect(args[0]);
-			new LightImpl(args[0]);
+			new AlarmImpl();
 		}
 	}
 
-	LightImpl(String ip) throws RemoteException {
-		intensity = 0;
+	// Constructor. La alarma está apagada cuando se instancia.
+	public AlarmImpl() throws RemoteException, InterruptedException {
+		status = 0;	
 		srv.addDevice(this);
-
+		while(true){
+			if (status >= 1){
+			System.out.println("ALARMA");
+			}
+			Thread.sleep(2000);
+		}
 	}
 
-	public void setIntensity(int intensity) throws RemoteException {
-		this.intensity = intensity;
-		System.out
-				.println("Intensidad de la bombilla ajustada a: " + intensity);
-		// TODO configurar la intensidad en el arduino
+	// Consulta el estado de la alarma.
+	public int getStatus() {
+		return status;
 	}
-	
-	public int getIntensity() throws RemoteException {
-		return intensity;
+
+	// Ajusta el estado de la alarm
+	public void setStatus(int status) {
+			this.status = status;
 	}
 
 	private static void connect(String ip) {

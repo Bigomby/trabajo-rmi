@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 
+import Services.Alarm;
 import Services.ClientService;
 import Services.Device;
 import Services.Light;
@@ -28,20 +29,56 @@ class Client {
 		try {
 			ClientService srv = (ClientService) Naming.lookup("//" + args[0]
 					+ ":" + "54321" + "/Client");
-
+			boolean found = false;
 			List<Device> devices = srv.getDevices();
 			Iterator<Device> it = devices.iterator();
 			Device device;
-			Light light;
-			int intensity = Integer.parseInt(args[1]);
 			
-			while (it.hasNext()) {
-				device = it.next();
-				if (device instanceof Light) {
-					System.out.println("Configurando intensidad a " + intensity);
-					light = (Light) device;
-					srv.setLightIntensity(light, intensity);
+			if (devices.isEmpty()){
+				System.out.println("Ningún dispositivo disponible.");
+				System.exit(0);
+			}
+
+			if (args[1].contentEquals("light")) {
+				Light light;
+				int intensity = Integer.parseInt(args[2]);
+				while (it.hasNext()) {
+					device = it.next();
+					if (device instanceof Light) {
+						found = true;
+						System.out.println("Configurando intensidad a "
+								+ intensity);
+						light = (Light) device;
+						light.setIntensity(intensity);
+					}
 				}
+				if(!found){
+					System.out.println("No se han encontrado bombillas");
+				}
+			} else if (args[1].contentEquals("alarm")) {
+				Alarm alarm;
+				int status = Integer.parseInt(args[2]);
+				if(!it.hasNext()){
+					System.out.println("Ninguna alarma disponible.");
+				}
+				while (it.hasNext()) {
+					device = it.next();
+					if (device instanceof Alarm) {
+						found = true;
+						alarm = (Alarm) device;
+						alarm.setStatus(status);
+						if (status == 0) {
+							System.out.println("Alarma apagada");
+						} else if (status >= 1) {
+							System.out.println("Alarma encendida");
+						}
+					}
+				}
+				if(!found){
+					System.out.println("No se han encontrado alarmas");
+				}
+			} else {
+				System.out.println("Uso: Client <device> <arg>");
 			}
 
 		} catch (RemoteException e) {

@@ -38,6 +38,5 @@ public class Server {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-
 	}
 }

@@ -13,12 +13,15 @@ public class DeviceServiceImpl extends UnicastRemoteObject implements
 
 	private static final long serialVersionUID = 1L;
 	List<Device> connectedDevices;
-	
+
 	DeviceServiceImpl(List<Device> connectedDevices) throws RemoteException {
 		this.connectedDevices = connectedDevices;
 	}
 
-	@Override
+	/*
+	 * Permite a los dispositivos darse de alta en el servidor para poder ser
+	 * controlados por los cliente o enviar notificaciones.
+	 */
 	public void addDevice(Device device) throws RemoteException {
 		connectedDevices.add(device);
 	}
