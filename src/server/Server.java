@@ -1,11 +1,12 @@
-package Server;
+package server;
+
+import interfaces.Device;
 
 import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import Interfaces.Device;
 
 /*
  * Servidor

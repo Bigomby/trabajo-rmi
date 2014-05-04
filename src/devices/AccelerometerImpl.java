@@ -1,4 +1,8 @@
-package Devices;
+package devices;
+
+import interfaces.Accelerometer;
+import interfaces.Alarm;
+import interfaces.Device;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,10 +12,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Iterator;
 
-import Interfaces.Accelerometer;
-import Interfaces.Alarm;
-import Interfaces.Device;
-import Services.ControllerService;
+import services.ControllerService;
+
 
 /*
  * Dispositivo: Acelerómetro

@@ -1,11 +1,13 @@
-package Server;
+package server;
+
+import interfaces.Device;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-import Interfaces.Device;
-import Services.ControllableService;
+import services.ControllableService;
+
 
 /*
  * Presta servicio a los dispositivos controlables.

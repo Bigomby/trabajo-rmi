@@ -1,12 +1,14 @@
-package Devices;
+package devices;
+
+import interfaces.Alarm;
+import interfaces.Device;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import Interfaces.Alarm;
-import Interfaces.Device;
-import Services.ControllableService;
+import serial.SerialWriter;
+import services.ControllableService;
 
 /*
  * Dispositivo: Alarma
@@ -19,8 +21,9 @@ public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 	private static final long serialVersionUID = 1L;
 	private int status;
 	private static ControllableService srv;
-	
-	public static void main(String[] args) throws RemoteException, InterruptedException {
+
+	public static void main(String[] args) throws RemoteException,
+			InterruptedException {
 		if (args.length != 1) {
 			System.out.println("Uso: AlarmImpl <host>");
 		} else {
@@ -32,12 +35,22 @@ public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 
 	// Constructor. La alarma está apagada cuando se instancia.
 	public AlarmImpl() throws RemoteException, InterruptedException {
+		boolean activa = false;
 		status = 0;	
 		srv.addDevice(this);
 		Runtime.getRuntime().addShutdownHook(new ShutdownHookAlarm(srv, this));
+		
+		SerialWriter writer = new SerialWriter();
 		while(true){
 			if (status >= 1){
-			System.out.println("ALARMA");
+				System.out.println("ALARMA");
+				if (!activa){
+					writer.startAlarm();
+					activa = true;
+				}
+			} else if (activa){
+				activa = false;	
+				writer.stopAlarm();
 			}
 			Thread.sleep(2000);
 		}
@@ -50,7 +63,7 @@ public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 
 	// Ajusta el estado de la alarm
 	public void setStatus(int status) {
-			this.status = status;
+		this.status = status;
 	}
 
 	private static void connect(String ip) {
@@ -68,26 +81,25 @@ public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 			e.printStackTrace();
 		}
 	}
-	
+
 }
 
-class ShutdownHookAlarm extends Thread{
-	
+class ShutdownHookAlarm extends Thread {
+
 	private ControllableService srv;
 	private Device device;
-	
-    public ShutdownHookAlarm (ControllableService srv, Device device){
-    	this.srv = srv;
-    	this.device = device;
-    }
 
-    public void run() {
-        try{
-            srv.removeDevice(device);
-            System.out.println("Dispositivo desconectado.");
-        }
-        catch(RemoteException e){
-            System.err.println("Error de comunicacion: " + e.toString());
-        }
-    }
+	public ShutdownHookAlarm(ControllableService srv, Device device) {
+		this.srv = srv;
+		this.device = device;
+	}
+
+	public void run() {
+		try {
+			srv.removeDevice(device);
+			System.out.println("Dispositivo desconectado.");
+		} catch (RemoteException e) {
+			System.err.println("Error de comunicacion: " + e.toString());
+		}
+	}
 }

@@ -1,14 +1,16 @@
-package Monitor;
+package monitor;
+
+import interfaces.Alarm;
+import interfaces.Device;
+import interfaces.Light;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 
-import Interfaces.Alarm;
-import Interfaces.Device;
-import Interfaces.Light;
-import Services.ControllerService;
+import services.ControllerService;
+
 
 /*
  * Cliente

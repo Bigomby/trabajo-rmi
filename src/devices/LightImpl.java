@@ -1,12 +1,14 @@
-package Devices;
+package devices;
+
+import interfaces.Device;
+import interfaces.Light;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import Interfaces.Device;
-import Interfaces.Light;
-import Services.ControllableService;
+import services.ControllableService;
+
 
 /*
  * Dispositivo: Bombilla

@@ -1,12 +1,14 @@
-package Server;
+package server;
+
+import interfaces.Device;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-import Interfaces.Device;
-import Services.ControllerService;
+import services.ControllerService;
+
 
 /*
  * Presta servicio al cliente.

@@ -1,14 +1,16 @@
-package Devices;
+package devices;
+
+import interfaces.Device;
+import interfaces.Light;
+import interfaces.Switch;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 
-import Interfaces.Device;
-import Interfaces.Light;
-import Interfaces.Switch;
-import Services.ControllerService;
+import services.ControllerService;
+
 
 /*
  * Dispositivo: Acelerómetro

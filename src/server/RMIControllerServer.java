@@ -1,4 +1,4 @@
-package Server;
+package server;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -8,12 +8,12 @@ import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.util.Enumeration;
 
-public class RMIControllableServer implements Runnable {
+public class RMIControllerServer implements Runnable {
 
-	ControllableServiceImpl controllableService;
+	ControllerServiceImpl controllerService;
 
-	RMIControllableServer(ControllableServiceImpl controllableService) {
-		this.controllableService = controllableService;
+	RMIControllerServer(ControllerServiceImpl controllerService) {
+		this.controllerService = controllerService;
 	}
 
 	public void run() {
@@ -24,15 +24,16 @@ public class RMIControllableServer implements Runnable {
 			System.setSecurityManager(new RMISecurityManager());
 		}
 		try {
-			Naming.rebind("//" + ip + ":" + "54321" + "/Controllable", controllableService);
 
-			System.out.println("Servidor de dispositivos iniciado en " + ip);
+			Naming.rebind("//" + ip + ":" + "54321" + "/Controller", controllerService);
+
+			System.out.println("Servidor de clientes iniciado en " + ip);
 
 		} catch (RemoteException e) {
 			System.out.println("Error de comunicacion: " + e.toString());
 			System.exit(1);
 		} catch (Exception e) {
-			System.out.println("Excepcion en dispositivo:");
+			System.out.println("Excepcion en cliente:");
 			e.printStackTrace();
 			System.exit(1);
 		}
