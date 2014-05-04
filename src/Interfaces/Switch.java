@@ -1,4 +1,5 @@
-package Services;
+package Interfaces;
+
 
 public interface Switch extends Device {
 

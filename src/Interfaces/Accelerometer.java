@@ -1,4 +1,5 @@
-package Services;
+package Interfaces;
+
 
 public interface Accelerometer extends Device {
 

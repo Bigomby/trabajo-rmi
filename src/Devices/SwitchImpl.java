@@ -2,39 +2,145 @@ package Devices;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.util.Iterator;
+import java.util.List;
 
-import Services.Device;
-import Services.DeviceService;
-import Services.Switch;
+import Interfaces.Device;
+import Interfaces.Light;
+import Interfaces.Switch;
+import Services.ControllerService;
 
 /*
  * Dispositivo: Acelerómetro
  * Activa la alarma en caso de detectar movimiento
  */
 
-public class SwitchImpl extends UnicastRemoteObject implements
-		Switch {
+public class SwitchImpl implements Switch {
 
-	private static final long serialVersionUID = 1L;
-	private static DeviceService srv;
+	private static ControllerService srv;
 
 	public static void main(String[] args) throws RemoteException,
 			InterruptedException {
-		if (args.length != 1) {
-			System.out.println("Uso: SwitchImpl <host>");
-		} else {
-			System.setProperty("java.security.policy", "file:policies.policy");
+		System.setProperty("java.security.policy", "file:policies.policy");
+		if (args.length > 1) {
 			connect(args[0]);
-			new SwitchImpl();
+			if (args[1].contentEquals("on"))
+				turnOn();
+			if (args[1].contentEquals("off"))
+				turnOff();
+			if (args[1].contentEquals("toggle"))
+				toggle();
+			if (args[1].contentEquals("set"))
+				set(Integer.parseInt(args[2]));
+		} else {
+			System.out.println("Uso: SwitchImpl <on|off|toggle|set> <value>");
+		}
+
+	}
+
+	private static void set(int intensity) throws RemoteException {
+		boolean found = false;
+		List<Device> devices = srv.getControllableDevices();
+		Iterator<Device> it = devices.iterator();
+		Device device;
+		Light light;
+
+		if (devices.isEmpty()) {
+			System.out.println("Ningún dispositivo disponible.");
+			System.exit(0);
+		}
+
+		while (it.hasNext()) {
+			device = it.next();
+			if (device instanceof Light) {
+				found = true;
+				System.out.println("Configurando intensidad a " + intensity);
+				light = (Light) device;
+				light.setIntensity(intensity);
+			}
+		}
+		if (!found) {
+			System.out.println("No se han encontrado bombillas");
+		}
+
+	}
+
+	private static void turnOn() throws RemoteException {
+		boolean found = false;
+		List<Device> devices = srv.getControllableDevices();
+		Iterator<Device> it = devices.iterator();
+		Device device;
+		Light light;
+
+		if (devices.isEmpty()) {
+			System.out.println("Ningún dispositivo disponible.");
+			System.exit(0);
+		}
+
+		while (it.hasNext()) {
+			device = it.next();
+			if (device instanceof Light) {
+				found = true;
+				System.out.println("Encendiendo bombilla");
+				light = (Light) device;
+				light.turnOn();
+			}
+		}
+		if (!found) {
+			System.out.println("No se han encontrado bombillas");
 		}
 	}
 
-	// Constructor. La alarma está apagada cuando se instancia.
-	public SwitchImpl() throws RemoteException, InterruptedException {
-		srv.addDevice(this);
-		Runtime.getRuntime().addShutdownHook(new ShutdownHookSwitch(srv, this));
-		// TODO Código del interruptor
+	private static void turnOff() throws RemoteException {
+		boolean found = false;
+		List<Device> devices = srv.getControllableDevices();
+		Iterator<Device> it = devices.iterator();
+		Device device;
+		Light light;
+
+		if (devices.isEmpty()) {
+			System.out.println("Ningún dispositivo disponible.");
+			System.exit(0);
+		}
+
+		while (it.hasNext()) {
+			device = it.next();
+			if (device instanceof Light) {
+				found = true;
+				System.out.println("Apagando bombilla");
+				light = (Light) device;
+				light.turnOff();
+			}
+		}
+		if (!found) {
+			System.out.println("No se han encontrado bombillas");
+		}
+	}
+
+	private static void toggle() throws RemoteException {
+		boolean found = false;
+		List<Device> devices = srv.getControllableDevices();
+		Iterator<Device> it = devices.iterator();
+		Device device;
+		Light light;
+
+		if (devices.isEmpty()) {
+			System.out.println("Ningún dispositivo disponible.");
+			System.exit(0);
+		}
+
+		while (it.hasNext()) {
+			device = it.next();
+			if (device instanceof Light) {
+				found = true;
+				System.out.println("Apagando/Encendiendo bombilla");
+				light = (Light) device;
+				light.toggle();
+			}
+		}
+		if (!found) {
+			System.out.println("No se han encontrado bombillas");
+		}
 	}
 
 	private static void connect(String ip) {
@@ -43,34 +149,13 @@ public class SwitchImpl extends UnicastRemoteObject implements
 		}
 
 		try {
-			srv = (DeviceService) Naming.lookup("//" + ip + ":" + "54321"
-					+ "/Device");
+			srv = (ControllerService) Naming.lookup("//" + ip + ":" + "54321"
+					+ "/Controller");
 		} catch (RemoteException e) {
 			System.err.println("Error de comunicacion: " + e.toString());
 		} catch (Exception e) {
 			System.err.println("Excepcion en Light:");
 			e.printStackTrace();
-		}
-	}
-
-}
-
-class ShutdownHookSwitch extends Thread {
-
-	private DeviceService srv;
-	private Device device;
-
-	public ShutdownHookSwitch(DeviceService srv, Device device) {
-		this.srv = srv;
-		this.device = device;
-	}
-
-	public void run() {
-		try {
-			srv.removeDevice(device);
-			System.out.println("Dispositivo desconectado.");
-		} catch (RemoteException e) {
-			System.err.println("Error de comunicacion: " + e.toString());
 		}
 	}
 }

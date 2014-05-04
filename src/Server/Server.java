@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import Services.Device;
+import Interfaces.Device;
 
 /*
  * Servidor
@@ -24,16 +24,16 @@ public class Server {
 			List<Device> connectedDevices = (List<Device>) Collections
 					.synchronizedList(new LinkedList<Device>());
 
-			ClientServiceImpl clientService = new ClientServiceImpl(
+			ControllerServiceImpl clientService = new ControllerServiceImpl(
 					connectedDevices);
-			DeviceServiceImpl deviceService = new DeviceServiceImpl(
+			ControllableServiceImpl listenerService = new ControllableServiceImpl(
 					connectedDevices);
 
-			Runnable clientServer = new RMIClientServer(clientService);
-			Runnable deviceServer = new RMIDeviceServer(deviceService);
+			Runnable controllerServer = new RMIControllerServer(clientService);
+			Runnable controllableServer = new RMIControllableServer(listenerService);
 
-			new Thread(clientServer).start();
-			new Thread(deviceServer).start();
+			new Thread(controllerServer).start();
+			new Thread(controllableServer).start();
 
 		} catch (RemoteException e) {
 			e.printStackTrace();

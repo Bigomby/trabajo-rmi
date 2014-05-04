@@ -1,14 +1,14 @@
-package Client;
+package Monitor;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 
-import Services.Alarm;
-import Services.ClientService;
-import Services.Device;
-import Services.Light;
+import Interfaces.Alarm;
+import Interfaces.Device;
+import Interfaces.Light;
+import Services.ControllerService;
 
 /*
  * Cliente
@@ -17,7 +17,7 @@ import Services.Light;
  * para controlarlos o suscribirse a notificaciones de los dispositivos que los soporten.
  */
 
-class Client {
+public class Monitor {
 
 	static public void main(String args[]) {
 		System.setProperty("java.security.policy", "file:policies.policy");
@@ -27,10 +27,10 @@ class Client {
 		}
 
 		try {
-			ClientService srv = (ClientService) Naming.lookup("//" + args[0]
-					+ ":" + "54321" + "/Client");
+			ControllerService srv = (ControllerService) Naming.lookup("//" + args[0]
+					+ ":" + "54321" + "/Controller");
 			boolean found = false;
-			List<Device> devices = srv.getDevices();
+			List<Device> devices = srv.getControllableDevices();
 			Iterator<Device> it = devices.iterator();
 			Device device;
 			

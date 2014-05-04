@@ -4,9 +4,9 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import Services.Alarm;
-import Services.Device;
-import Services.DeviceService;
+import Interfaces.Alarm;
+import Interfaces.Device;
+import Services.ControllableService;
 
 /*
  * Dispositivo: Alarma
@@ -18,7 +18,7 @@ public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 
 	private static final long serialVersionUID = 1L;
 	private int status;
-	private static DeviceService srv;
+	private static ControllableService srv;
 	
 	public static void main(String[] args) throws RemoteException, InterruptedException {
 		if (args.length != 1) {
@@ -59,8 +59,8 @@ public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 		}
 
 		try {
-			srv = (DeviceService) Naming.lookup("//" + ip + ":" + "54321"
-					+ "/Device");
+			srv = (ControllableService) Naming.lookup("//" + ip + ":" + "54321"
+					+ "/Controllable");
 		} catch (RemoteException e) {
 			System.err.println("Error de comunicacion: " + e.toString());
 		} catch (Exception e) {
@@ -73,10 +73,10 @@ public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 
 class ShutdownHookAlarm extends Thread{
 	
-	private DeviceService srv;
+	private ControllableService srv;
 	private Device device;
 	
-    public ShutdownHookAlarm (DeviceService srv, Device device){
+    public ShutdownHookAlarm (ControllableService srv, Device device){
     	this.srv = srv;
     	this.device = device;
     }

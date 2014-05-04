@@ -1,23 +1,26 @@
 package Devices;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Iterator;
 
-import Services.Accelerometer;
-import Services.Device;
-import Services.DeviceService;
+import Interfaces.Accelerometer;
+import Interfaces.Alarm;
+import Interfaces.Device;
+import Services.ControllerService;
 
 /*
  * Dispositivo: Acelerómetro
  * Activa la alarma en caso de detectar movimiento
  */
 
-public class AccelerometerImpl extends UnicastRemoteObject implements
-		Accelerometer {
+public class AccelerometerImpl implements Accelerometer {
 
-	private static final long serialVersionUID = 1L;
-	private static DeviceService srv;
+	private static ControllerService srv;
 
 	public static void main(String[] args) throws RemoteException,
 			InterruptedException {
@@ -26,15 +29,48 @@ public class AccelerometerImpl extends UnicastRemoteObject implements
 		} else {
 			System.setProperty("java.security.policy", "file:policies.policy");
 			connect(args[0]);
-			new AccelerometerImpl();
+
+			try {
+				BufferedReader bufferRead = new BufferedReader(
+						new InputStreamReader(System.in));
+
+				while (true) {
+					System.out.println("");
+					System.out
+							.println("Pulsa intro para detectar movimiento...");
+					String s = bufferRead.readLine();
+					if (s.length() == 0)
+						alert();
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
-	// Constructor. La alarma está apagada cuando se instancia.
-	public AccelerometerImpl() throws RemoteException, InterruptedException {
-		srv.addDevice(this);
-		Runtime.getRuntime().addShutdownHook(new ShutdownHookAccelerometer(srv, this));
-		// TODO Código del acelerómetro
+	private static void alert() throws RemoteException {
+		Alarm alarm;
+		Iterator<Device> it = srv.getControllableDevices().iterator();
+		Device device;
+		boolean found = false;
+
+		System.out.println("¡¡BZZZZ!! ¡Detectado movimiento!");
+		System.out.println("");
+		if (!it.hasNext()) {
+			System.out.println("Ninguna alarma disponible.");
+		}
+		while (it.hasNext()) {
+			device = it.next();
+			if (device instanceof Alarm) {
+				found = true;
+				alarm = (Alarm) device;
+				alarm.setStatus(1);
+			}
+			if (!found) {
+				System.out.println("No se han encontrado alarmas");
+			}
+		}
 	}
 
 	private static void connect(String ip) {
@@ -43,8 +79,8 @@ public class AccelerometerImpl extends UnicastRemoteObject implements
 		}
 
 		try {
-			srv = (DeviceService) Naming.lookup("//" + ip + ":" + "54321"
-					+ "/Device");
+			srv = (ControllerService) Naming.lookup("//" + ip + ":" + "54321"
+					+ "/Controller");
 		} catch (RemoteException e) {
 			System.err.println("Error de comunicacion: " + e.toString());
 		} catch (Exception e) {
@@ -53,24 +89,4 @@ public class AccelerometerImpl extends UnicastRemoteObject implements
 		}
 	}
 
-}
-
-class ShutdownHookAccelerometer extends Thread {
-
-	private DeviceService srv;
-	private Device device;
-
-	public ShutdownHookAccelerometer(DeviceService srv, Device device) {
-		this.srv = srv;
-		this.device = device;
-	}
-
-	public void run() {
-		try {
-			srv.removeDevice(device);
-			System.out.println("Dispositivo desconectado.");
-		} catch (RemoteException e) {
-			System.err.println("Error de comunicacion: " + e.toString());
-		}
-	}
 }

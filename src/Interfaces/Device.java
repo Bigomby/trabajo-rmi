@@ -1,4 +1,4 @@
-package Services;
+package Interfaces;
 
 import java.rmi.Remote;
 

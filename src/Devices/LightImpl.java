@@ -4,9 +4,9 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import Services.Device;
-import Services.DeviceService;
-import Services.Light;
+import Interfaces.Device;
+import Interfaces.Light;
+import Services.ControllableService;
 
 /*
  * Dispositivo: Bombilla
@@ -19,7 +19,7 @@ public class LightImpl extends UnicastRemoteObject implements Light {
 
 	private static final long serialVersionUID = 1L;
 	private int intensity;
-	private static DeviceService srv;
+	private static ControllableService srv;
 
 	public static void main(String[] args) throws RemoteException {
 		if (args.length != 1) {
@@ -37,15 +37,32 @@ public class LightImpl extends UnicastRemoteObject implements Light {
 		Runtime.getRuntime().addShutdownHook(new ShutdownHookLight(srv, this));
 	}
 
-	public void setIntensity(int intensity) throws RemoteException {
-		this.intensity = intensity;
-		System.out
-				.println("Intensidad de la bombilla ajustada a: " + intensity);
-		// TODO configurar la intensidad en el arduino
+	public void turnOn() {
+		intensity = 255;
+		System.out.println("Bombilla encendida");
 	}
-	
-	public int getIntensity() throws RemoteException {
-		return intensity;
+
+	public void turnOff() {
+		intensity = 0;
+		System.out.println("Bombilla apagada");
+	}
+
+	public void toggle() {
+		if (intensity > 0) {
+			intensity = 0;
+			System.out.println("Bombilla apagada");
+		} else {
+			intensity = 255;
+			System.out.println("Bombilla encendida");
+		}
+	}
+
+	public void setIntensity(int intensity) throws RemoteException {
+		if (intensity < 0 && intensity > 255) {
+			this.intensity = intensity;
+			System.out.println("Intensidad de la bombilla ajustada a: "
+					+ intensity);
+		}
 	}
 
 	private static void connect(String ip) {
@@ -54,8 +71,8 @@ public class LightImpl extends UnicastRemoteObject implements Light {
 		}
 
 		try {
-			srv = (DeviceService) Naming.lookup("//" + ip + ":" + "54321"
-					+ "/Device");
+			srv = (ControllableService) Naming.lookup("//" + ip + ":" + "54321"
+					+ "/Controllable");
 		} catch (RemoteException e) {
 			System.err.println("Error de comunicacion: " + e.toString());
 		} catch (Exception e) {
@@ -65,23 +82,22 @@ public class LightImpl extends UnicastRemoteObject implements Light {
 	}
 }
 
-class ShutdownHookLight extends Thread{
-	
-	private DeviceService srv;
-	private Device device;
-	
-    public ShutdownHookLight (DeviceService srv, Device device){
-    	this.srv = srv;
-    	this.device = device;
-    }
+class ShutdownHookLight extends Thread {
 
-    public void run() {
-        try{
-            srv.removeDevice(device);
-            System.out.println("Dispositivo desconectado.");
-        }
-        catch(RemoteException e){
-            System.err.println("Error de comunicacion: " + e.toString());
-        }
-    }
+	private ControllableService srv;
+	private Device device;
+
+	public ShutdownHookLight(ControllableService srv, Device device) {
+		this.srv = srv;
+		this.device = device;
+	}
+
+	public void run() {
+		try {
+			srv.removeDevice(device);
+			System.out.println("Dispositivo desconectado.");
+		} catch (RemoteException e) {
+			System.err.println("Error de comunicacion: " + e.toString());
+		}
+	}
 }
