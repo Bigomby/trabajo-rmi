@@ -1,6 +1,5 @@
 package devices;
 
-import interfaces.Accelerometer;
 import interfaces.Alarm;
 import interfaces.Device;
 
@@ -9,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Iterator;
 
 import services.ControllerService;
@@ -20,7 +18,7 @@ import services.ControllerService;
  * Activa la alarma en caso de detectar movimiento
  */
 
-public class AccelerometerImpl implements Accelerometer {
+public class AccelerometerImpl {
 
 	private static ControllerService srv;
 
@@ -67,7 +65,7 @@ public class AccelerometerImpl implements Accelerometer {
 			if (device instanceof Alarm) {
 				found = true;
 				alarm = (Alarm) device;
-				alarm.setStatus(1);
+				alarm.start();
 			}
 			if (!found) {
 				System.out.println("No se han encontrado alarmas");

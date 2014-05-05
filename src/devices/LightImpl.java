@@ -73,6 +73,8 @@ public class LightImpl extends UnicastRemoteObject implements Light {
 		}
 
 		try {
+			System.out.println("//" + ip + ":" + "54321"
+					+ "/Controllable");
 			srv = (ControllableService) Naming.lookup("//" + ip + ":" + "54321"
 					+ "/Controllable");
 		} catch (RemoteException e) {

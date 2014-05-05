@@ -56,14 +56,13 @@ public class AlarmImpl extends UnicastRemoteObject implements Alarm {
 		}
 	}
 
-	// Consulta el estado de la alarma.
-	public int getStatus() {
-		return status;
+// Ajusta el estado de la alarm
+	public void start() throws RemoteException {
+		status = 1;
 	}
-
-	// Ajusta el estado de la alarm
-	public void setStatus(int status) {
-		this.status = status;
+	
+	public void stop() throws RemoteException {
+		status = 0;
 	}
 
 	private static void connect(String ip) {

@@ -2,7 +2,6 @@ package devices;
 
 import interfaces.Device;
 import interfaces.Light;
-import interfaces.Switch;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -17,7 +16,7 @@ import services.ControllerService;
  * Activa la alarma en caso de detectar movimiento
  */
 
-public class SwitchImpl implements Switch {
+public class SwitchImpl {
 
 	private static ControllerService srv;
 

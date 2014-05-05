@@ -68,11 +68,12 @@ public class Monitor {
 					if (device instanceof Alarm) {
 						found = true;
 						alarm = (Alarm) device;
-						alarm.setStatus(status);
 						if (status == 0) {
+							alarm.stop();
 							System.out.println("Alarma apagada");
 						} else if (status >= 1) {
 							System.out.println("Alarma encendida");
+							alarm.start();
 						}
 					}
 				}
