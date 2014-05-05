@@ -7,13 +7,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-
 /*
  * Servidor
  * 
- * Recibe las conexiones tanto de los clientes como de los diferentes dispositivos y se encarga
- * de reenviar las peticiones. También recibe notificaciones de los dispositivos en el caso  de 
- * que las envíen y las envía a los clientes que estén suscritos a éstas.
+ * Recibe las conexiones tanto de los dispositivos controlables como de los dispositivos
+ * controladores y les ofrece servicios.
+ * 
+ * Tiene una lista de los dispositivos controlables. Cuando un dispositivo controlador
+ * se conecta se le envía la lista de dispositivos controlables.
+ * 
  */
 
 public class Server {
@@ -31,7 +33,8 @@ public class Server {
 					connectedDevices);
 
 			Runnable controllerServer = new RMIControllerServer(clientService);
-			Runnable controllableServer = new RMIControllableServer(listenerService);
+			Runnable controllableServer = new RMIControllableServer(
+					listenerService);
 
 			new Thread(controllerServer).start();
 			new Thread(controllableServer).start();

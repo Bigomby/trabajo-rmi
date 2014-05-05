@@ -8,6 +8,11 @@ import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.util.Enumeration;
 
+/*
+ * La instancia que se encarga de las conexiones de los dispositivos controladores.
+ * Corre en un hilo propio.
+ */
+
 public class RMIControllerServer implements Runnable {
 
 	ControllerServiceImpl controllerService;

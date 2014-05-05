@@ -11,7 +11,7 @@ import services.ControllerService;
 
 
 /*
- * Presta servicio al cliente.
+ * Presta servicio a los controladores.
  */
 public class ControllerServiceImpl extends UnicastRemoteObject implements
 		ControllerService, Serializable {

@@ -12,7 +12,7 @@ import services.ControllableService;
 
 /*
  * Dispositivo: Alarma
- * Controla el estado de la alarma
+ * Si la alarma está activa lo notifica por pantalla.
  * El valor puede ser 0 (apagada) o 1 (encendida)
  */
 

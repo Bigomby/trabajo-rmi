@@ -9,6 +9,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
 
+
+/*
+ * Permite detectar eventos en puerto serie como la recepción de datos.
+ */
 public class SerialListener implements SerialPortEventListener {
 	SerialPort serialPort;
 	/** The port we're normally going to use. */

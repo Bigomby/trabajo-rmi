@@ -7,6 +7,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
+/*
+ *  Permite enviar datos por puerto serie a un Arduino.
+ * 
+ *  Concretamente hemos implementado los métodos 'startAlarm()'
+ *  y 'stopAlarm()' que envía los comandos para activar y desactivar
+ *  la alarma en el Arduino.
+ */
+
 public class SerialWriter {
 	SerialPort serialPort;
 	/** The port we're normally going to use. */
@@ -17,26 +25,16 @@ public class SerialWriter {
 	private static final int DATA_RATE = 9600;
 
 	/*
-	public static void main(String[] args) throws Exception {
-		SerialWriter main = new SerialWriter();
-		main.initialize();
-		Thread t = new Thread() {
-			public void run() {
-				// the following line will keep this app alive for 1000 seconds,
-				// waiting for events to occur and responding to them (printing
-				// incoming messages to console).
-				try {
-					Thread.sleep(1000000);
-				} catch (InterruptedException ie) {
-				}
-			}
-		};
-		t.start();
-		System.out.println("Started");
-	}
-	*/
-	
-	public SerialWriter(){
+	 * public static void main(String[] args) throws Exception { SerialWriter
+	 * main = new SerialWriter(); main.initialize(); Thread t = new Thread() {
+	 * public void run() { // the following line will keep this app alive for
+	 * 1000 seconds, // waiting for events to occur and responding to them
+	 * (printing // incoming messages to console). try { Thread.sleep(1000000);
+	 * } catch (InterruptedException ie) { } } }; t.start();
+	 * System.out.println("Started"); }
+	 */
+
+	public SerialWriter() {
 		initialize();
 		System.out.println("Started");
 	}
@@ -84,23 +82,23 @@ public class SerialWriter {
 
 	public void startAlarm() {
 		try {
-				System.out.println("Activando alarma");
-				this.output.write('!');
-				this.output.write('0');
-				this.output.write('0');
-				this.output.write('.');
+			System.out.println("Activando alarma");
+			this.output.write('!');
+			this.output.write('0');
+			this.output.write('0');
+			this.output.write('.');
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void stopAlarm() {
 		try {
-				System.out.println("Desactivado alarma");
-				this.output.write('!');
-				this.output.write('0');
-				this.output.write('1');
-				this.output.write('.');
+			System.out.println("Desactivado alarma");
+			this.output.write('!');
+			this.output.write('0');
+			this.output.write('1');
+			this.output.write('.');
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

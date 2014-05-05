@@ -12,8 +12,8 @@ import services.ControllerService;
 
 
 /*
- * Dispositivo: Acelerómetro
- * Activa la alarma en caso de detectar movimiento
+ * Dispositivo: Interruptor
+ * Apaga, enciende o ajusta la intensidad de una bombilla.
  */
 
 public class SwitchImpl {
