@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Trabajo-rmi by Bigomby</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Trabajo-rmi</h1>
+        <h2>Trabajo para la asignatura Sistemas Distribuidos y Servicios Web de 4º de GITT de la Universidad de Sevilla.</h2>
+        <a href="https://github.com/Bigomby/trabajo-rmi" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="simulaci%C3%B3n-de-sistema-dom%C3%B3tico" class="anchor" href="#simulaci%C3%B3n-de-sistema-dom%C3%B3tico"><span class="octicon octicon-link"></span></a>Simulación de Sistema Domótico</h1>
+
+<h2>
+<a name="introducci%C3%B3n" class="anchor" href="#introducci%C3%B3n"><span class="octicon octicon-link"></span></a>Introducción</h2>
+
+<p>A continuación exponemos el funcionamiento de un simulador de un sistema de domótica diseñado para la asignatura Sistemas Distribuidos y Servicios Web.</p>
+
+<p>El sistema se componen de varios dispositivos que se comunican entre ellos usando RMI (Remote Method Invocation). En nuestro ejemplo, los sitemas finales también se comunican por puerto serie con un microcontrolador que permite ver de forma más visual el control de los dispositivos.</p>
+
+<p>Vamos a ver cada componente del sistema y describir su funcionamiento.</p>
+
+<h2>
+<a name="servidor" class="anchor" href="#servidor"><span class="octicon octicon-link"></span></a>Servidor</h2>
+
+<p>En primer lugar tenemos nuestro servidor RMI. Su labor es registrar los diferentes dispositivos que pueden ser controlados, en nuestro caso vamos a usar una bombilla y una alarma, y ofrecer unos servicios a los controladores para que puedan interactuar con dichos dispositivos.</p>
+
+<p>El servidor usa dos hilos sincronizados para levantar dos servicios diferentes, uno en <code>//ip:54321/Controller</code> y otro en <code>//ip:54321/Controllable</code>. De esta forma podemos atender simultáneamente a dispositivos controladores y controlables.</p>
+
+<p>El servidor tiene una lista de los dispositivos controlables conectados en cada momento y que pueden solicitar en cualquier momento los dispositivos controladores.</p>
+
+<p>Como hay dos tipos de dispositivos se implementan dos servicio:</p>
+
+<ul>
+<li>
+<code>ControllableService</code>: Para dispositivos que serán controlados.</li>
+</ul><div class="highlight highlight-java"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ControllableService</span> <span class="kd">extends</span> <span class="n">Remote</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addDevice</span><span class="o">(</span><span class="n">Device</span> <span class="n">device</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">removeDevice</span><span class="o">(</span><span class="n">Device</span> <span class="n">device</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>
+
+<ul>
+<li>
+<code>ControllerService</code>: Para controladores.</li>
+</ul><div class="highlight highlight-java"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ControllerService</span> <span class="kd">extends</span> <span class="n">Remote</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Device</span><span class="o">&gt;</span> <span class="nf">getControllableDevices</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>
+
+<h2>
+<a name="dispositivos-controlables" class="anchor" href="#dispositivos-controlables"><span class="octicon octicon-link"></span></a>Dispositivos controlables</h2>
+
+<p>Como hemos visto anteriormente, tenemos dos tipos de dispositivos. Vamos a ver los dispositivos controlables.</p>
+
+<p>Este tipo de dispositivos no envían información al servidor. Cuando se instancian se conectarán al servidor y se darán de alta en él añadíendose a la lista de dispositivos conectados. Al terminarse la ejecución del código de estos dispositivos serán dados de baja del servidor. Podemos tener tantos dispositivos como queramos.</p>
+
+<p>En nuestro ejemplo hemos definido dos tipos de dispositivos controlables, se podrían haber definido muchos más, pero para una demostración será suficiente.</p>
+
+<h3>
+<a name="light" class="anchor" href="#light"><span class="octicon octicon-link"></span></a>Light</h3>
+
+<p>El dispositivo controlable <code>LightImpl</code> es el más simple. Representa una bombilla que puede estar apagada, encendida o, en genera, tomar un valor entre 0 y 255 que representará la intensidad. Implementa la interfaz <code>Light</code>.</p>
+
+<div class="highlight highlight-java"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Light</span> <span class="kd">extends</span> <span class="n">Device</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="nf">setIntensity</span><span class="o">(</span><span class="kt">int</span> <span class="n">intensity</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+    <span class="kt">void</span> <span class="nf">turnOn</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+    <span class="kt">void</span> <span class="nf">turnOff</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+    <span class="kt">void</span> <span class="nf">toggle</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>Como vemos, la interfaz <code>Light</code> a su vez hereda de la interfaz <code>Device</code>. Todos los dispositivos heredan de esta interfaz.</p>
+
+<h3>
+<a name="alarmimpl" class="anchor" href="#alarmimpl"><span class="octicon octicon-link"></span></a>AlarmImpl</h3>
+
+<p>Nuesto segundo dispositivo de ejemplo es un poco más complejo. Se trata de una alarma que puede tomar el valor 0 o cualquier valor mayor que 1. Cuando se instancia, al igual que todos los dispositivos controlables, se conecta al servidor y se da de alta en la lista de dipositivos conectados. 
+Cuando la alarma es activada, empieza a imprimir por pantalla cada dos segundos la palabra "ALARMA", hasta que es desactivada. A continuacion vemos la intefaz implementada por <code>AlarmaImpl</code>:</p>
+
+<div class="highlight highlight-java"><pre><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Alarm</span> <span class="kd">extends</span> <span class="n">Device</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">start</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">stop</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">RemoteException</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>
+
+<h2>
+<a name="dispositivos-controladores" class="anchor" href="#dispositivos-controladores"><span class="octicon octicon-link"></span></a>Dispositivos controladores</h2>
+
+<p>Estos dispositivos no reciben información, sólo envian órdenes. Cuando quieran realizar una acción se conectarán al servidor, obtendrán una lista de los dispositivos conectados y buscarán aquel con el que quieran interactuar. Vamos a ver los dos que hemos definido.</p>
+
+<h3>
+<a name="switch" class="anchor" href="#switch"><span class="octicon octicon-link"></span></a>Switch</h3>
+
+<p>Básicamente es un interruptor. Su tarea es buscar las bombillas conectadas y ejecutar alguna acción sobre ellas, gracias a que conoce la interfaz que implementa la bombilla.</p>
+
+<p>Los dispositivos controladores no necesitan darse de alta en ningún momento ni implementar ninguna interfaz. Su funcionamiento es parecido al de un cliente simple.</p>
+
+<h3>
+<a name="accelerometer" class="anchor" href="#accelerometer"><span class="octicon octicon-link"></span></a>Accelerometer</h3>
+
+<p>Representa un acelerómetro que al detectar un movimiento activaría la alarma. El funcionamiento es análogo al del switch. Este dispositivo esta siendo ejecutado monitorizando un evento y al producirse lanzará una conexión al servidor activando las alarmas que estén en ese momento conectadas al servidor.</p>
+
+<p>Tampoco se da de alta en el servidor, sólo lanza una petición al ocurrir el evento.</p>
+
+<h2>
+<a name="monitor" class="anchor" href="#monitor"><span class="octicon octicon-link"></span></a>Monitor</h2>
+
+<p>A parte de haber definido los dos tipos de dispositivos y el servidor también tenemos un <code>Monitor</code>. Dicho monitor nos permitiría comprobar el funcionamiento de los dispositivos ya que nos permite controlarlos a todos, por ejemplo, apagando y encendiendo alarmas  o luces.</p>
+
+<p>También se podría configurar para recibir eventos y mostrarlos por pantallas. Sería como una mezcla de los dos tipos de dispositivos en uno, para monitorizar lo que está ocurriendo.</p>
+
+<h2>
+<a name="ap%C3%A9ndice-comunicaciones-serie" class="anchor" href="#ap%C3%A9ndice-comunicaciones-serie"><span class="octicon octicon-link"></span></a>Apéndice: Comunicaciones serie</h2>
+
+<p>Para ilustrar de forma más visual nuestro trabajo hemos usado microcontroladores que se comunican por puerto serie con los dispositivos finales a fin de que parezca un sistema más "real".</p>
+
+<p>En nuestro ejemplo hemos usado un Arduino que se conecta por puerto serie con el objeto <code>AlarmaImpl</code>. Este objeto implementa unas librerías de comunicación serie con el Arduino y cuando la alarma es activada envía un comando y el Arduino hace parpadear un led rojo y emite un pitido.</p>
+
+<p>Durante la presentacion del trabajo intentaremos poder realizar un ejemplo completo con un acelerómetro conectado a un equipo que haga sonar la alarma en otro equipo de forma remota.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/Bigomby/trabajo-rmi/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/Bigomby/trabajo-rmi/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/Bigomby/trabajo-rmi"></a> is maintained by <a href="https://github.com/Bigomby">Bigomby</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
