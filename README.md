@@ -1,18 +1,5 @@
 #Simulación de Sistema Domótico
 
-- Diego Fernández Barrera
-- Sergio González Ramos
-
-
-----------
-
-
-[TOC]
-
-
-
-
-
 ## Introducción
 A continuación exponemos el funcionamiento de un simulador de un sistema de domótica diseñado para la asignatura Sistemas Distribuidos y Servicios Web.
 
