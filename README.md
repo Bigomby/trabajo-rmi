@@ -18,14 +18,14 @@ El servidor tiene una lista de los dispositivos controlables conectados en cada 
 Como hay dos tipos de dispositivos se implementan dos servicio:
 
 - `ControllableService`: Para dispositivos que serán controlados.
-```
+```java
 public interface ControllableService extends Remote {
 	public void addDevice(Device device) throws RemoteException;
 	public void removeDevice(Device device) throws RemoteException;
 }
 ```
 - `ControllerService`: Para controladores.
-```
+```java
 public interface ControllerService extends Remote {
 	public List<Device> getControllableDevices() throws RemoteException;
 }
@@ -42,7 +42,7 @@ En nuestro ejemplo hemos definido dos tipos de dispositivos controlables, se pod
 ### Light
 
 El dispositivo controlable `LightImpl` es el más simple. Representa una bombilla que puede estar apagada, encendida o, en genera, tomar un valor entre 0 y 255 que representará la intensidad. Implementa la interfaz `Light`.
-```
+```java
 public interface Light extends Device {
 	void setIntensity(int intensity) throws RemoteException;
 	void turnOn() throws RemoteException;
@@ -56,7 +56,7 @@ Como vemos, la interfaz `Light` a su vez hereda de la interfaz `Device`. Todos l
 
 Nuesto segundo dispositivo de ejemplo es un poco más complejo. Se trata de una alarma que puede tomar el valor 0 o cualquier valor mayor que 1. Cuando se instancia, al igual que todos los dispositivos controlables, se conecta al servidor y se da de alta en la lista de dipositivos conectados. 
 Cuando la alarma es activada, empieza a imprimir por pantalla cada dos segundos la palabra "ALARMA", hasta que es desactivada. A continuacion vemos la intefaz implementada por `AlarmaImpl`:
-```
+```java
 public interface Alarm extends Device {
 	public void start() throws RemoteException;
 	public void stop() throws RemoteException;
