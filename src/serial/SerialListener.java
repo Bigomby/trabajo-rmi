@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
 
+import devices.AccelerometerImpl;
+
 
 /*
  * Permite detectar eventos en puerto serie como la recepción de datos.
@@ -19,7 +21,7 @@ public class SerialListener implements SerialPortEventListener {
 	private static final String PORT_NAMES[] = { "/dev/tty.usbserial-A9007UX1",
 			"/dev/ttyACM0", "COM35" };
 	private BufferedReader input;
-	private static final int TIME_OUT = 2000;
+	private static final int TIME_OUT = 4000;
 	private static final int DATA_RATE = 9600;
 	
 	public static void main(String[] args) throws Exception {
@@ -92,6 +94,8 @@ public class SerialListener implements SerialPortEventListener {
 				if (input.ready()) {
 					inputLine = input.readLine();
 					System.out.println(inputLine);
+					if(inputLine.contains("01"));
+					AccelerometerImpl.alert();
 				}
 
 			} catch (Exception e) {

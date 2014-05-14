@@ -2,7 +2,7 @@ char messageBuffer[12], cmd[3];
 boolean debug = false;
 int index = 0;
 const int ledPin =  13;      // the number of the LED pin
-const int buzzPin = 12;
+const int buzzPin = 11;
 
 // Variables will change :
 int ledState = LOW;             // ledState used to set the LED
@@ -19,6 +19,7 @@ int active_alarm = 0;
 void setup(){
   Serial.begin(9600);
   pinMode(13, OUTPUT);
+  pinMode(11, OUTPUT);
   Serial.write("Power On");
 }
 
@@ -63,18 +64,20 @@ void alarm() {
     if(currentMillis - previousMillis >= interval) {
       // save the last time you blinked the LED 
       previousMillis = currentMillis;   
-  
+    
       // if the LED is off turn it on and vice-versa:
       if (ledState == LOW) {
         ledState = HIGH;
+        analogWrite(buzzPin,127);
       }
       else {
         ledState = LOW;
+        analogWrite(buzzPin,0);
       }
   
       // set the LED with the ledState of the variable:
       digitalWrite(ledPin, ledState);
-      digitalWrite(buzzPin, ledState);
+//      digitalWrite(buzzPin, ledState);
     } 
   } else {
     digitalWrite(ledPin, LOW);

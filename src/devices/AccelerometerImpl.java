@@ -10,8 +10,8 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 
+import serial.SerialListener;
 import services.ControllerService;
-
 
 /*
  * Dispositivo: Acelerómetro
@@ -24,32 +24,51 @@ public class AccelerometerImpl {
 
 	public static void main(String[] args) throws RemoteException,
 			InterruptedException {
-		if (args.length != 1) {
-			System.out.println("Uso: AccelerometerImpl <host>");
-		} else {
+		if (args.length == 2) {
 			System.setProperty("java.security.policy", "file:policies.policy");
 			connect(args[0]);
 
-			try {
-				BufferedReader bufferRead = new BufferedReader(
-						new InputStreamReader(System.in));
+			int option = Integer.parseInt(args[1]);
+			if (option == 1) {
+				try {
+					BufferedReader bufferRead = new BufferedReader(
+							new InputStreamReader(System.in));
 
-				while (true) {
-					System.out.println("");
-					System.out
-							.println("Pulsa intro para detectar movimiento...");
-					String s = bufferRead.readLine();
-					if (s.length() == 0)
-						alert();
+					while (true) {
+						System.out.println("");
+						System.out
+								.println("Pulsa intro para detectar movimiento...");
+						String s = bufferRead.readLine();
+						if (s.length() == 0)
+							alert();
+					}
+
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-
-			} catch (IOException e) {
-				e.printStackTrace();
+			} else if (option == 2) {
+				SerialListener listener = new SerialListener();
+				listener.initialize();
+				Thread t = new Thread() {
+					public void run() {
+						// the following line will keep this app alive for 1000 seconds,
+						// waiting for events to occur and responding to them (printing
+						// incoming messages to console).
+						try {
+							Thread.sleep(1000000);
+						} catch (InterruptedException ie) {
+						}
+					}
+				};
+				t.start();
+				System.out.println("Started");
 			}
+		} else {
+			System.out.println("Uso: AccelerometerImpl <host> <nodo>");
 		}
 	}
 
-	private static void alert() throws RemoteException {
+	public static void alert() throws RemoteException {
 		Alarm alarm;
 		Iterator<Device> it = srv.getControllableDevices().iterator();
 		Device device;

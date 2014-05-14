@@ -56,7 +56,7 @@ public class RMIControllableServer implements Runnable {
 				Enumeration<InetAddress> ee = n.getInetAddresses();
 				while (ee.hasMoreElements()) {
 					InetAddress i = (InetAddress) ee.nextElement();
-					if (i.getHostAddress().toString().startsWith("192.168.1.")) {
+					if (i.getHostAddress().toString().startsWith("192.168.")) {
 						ip = i.getHostAddress();
 					}
 				}
